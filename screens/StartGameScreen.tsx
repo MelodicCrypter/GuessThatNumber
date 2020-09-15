@@ -6,7 +6,12 @@ import Input from '../components/unique/Input';
 import NumberBox from '../components/common/NumberBox';
 import Colors from '../constants/colors';
 
-export default function StartGameScreen() {
+interface Props {
+    onGameStart: (num: number) => void;
+}
+
+export default function StartGameScreen({ onGameStart }: Props) {
+    const { alert } = Alert;
     const [enteredValue, setEnteredValue] = useState<string>('');
     const [confirmed, setConfirmed] = useState<boolean>(false);
     const [finalNumber, setFinalNumber] = useState<number>(0);
@@ -22,7 +27,7 @@ export default function StartGameScreen() {
     const handleConfirm = () => {
         const chosenNum = parseInt(enteredValue);
         if (isNaN(chosenNum) || chosenNum <= 0 || chosenNum > 99) {
-            Alert.alert('Invalid number!', 'Number must  between 1 and 99.', [
+            alert('Invalid number!', 'Number must  between 1 and 99.', [
                 { text: 'Okay', style: 'destructive', onPress: handleReset },
             ]);
             return;
@@ -33,14 +38,14 @@ export default function StartGameScreen() {
         setEnteredValue('');
     };
 
-    // Custom JSX
+    // Inline Card component with Start Game button
     let confirmedOutput;
     if (confirmed) {
         confirmedOutput = (
             <Card style={styles.preStartGameWrap}>
                 <Text style={styles.commonText}>Lez Go!</Text>
                 <NumberBox>{finalNumber}</NumberBox>
-                <Button title="START GAME" />
+                <Button title="START GAME" onPress={() => onGameStart(finalNumber)} />
             </Card>
         );
     }

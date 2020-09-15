@@ -12,13 +12,19 @@ import {
 
 import Header from './components/common/Header';
 import StartGameScreen from './screens/StartGameScreen';
+import MainGameScreen from './screens/MainGameScreen';
 
 export default function App() {
-    // Main Functions
+    const [userNumber, setUserNumber] = useState<undefined | null | number>();
 
-    // Helpers
+    const onGameStart = (num: number) => setUserNumber(num);
 
-    // Main: return text only if list is empty
+    // Screen seletor
+    let inlineScreenSelector = <StartGameScreen onGameStart={onGameStart} />;
+    if (userNumber) {
+        inlineScreenSelector = <MainGameScreen excluNum={userNumber} />;
+    }
+
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : null}
@@ -28,9 +34,7 @@ export default function App() {
 
             <SafeAreaView style={styles.secondLayerWrap}>
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                    <View style={styles.mainInnerWrap}>
-                        <StartGameScreen />
-                    </View>
+                    <View style={styles.mainInnerWrap}>{inlineScreenSelector}</View>
                 </TouchableWithoutFeedback>
             </SafeAreaView>
 
