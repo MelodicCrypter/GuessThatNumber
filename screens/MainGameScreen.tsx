@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Text, StyleSheet, View, Button, Alert } from 'react-native';
 
 import NumberBox from '../components/common/NumberBox';
@@ -7,15 +7,22 @@ import { randomize } from '../utils/numbersUtil';
 
 interface Props {
     excluNum: number;
+    onGameOver: (rounds: number) => void;
 }
 
-export default function MainGameScreen({ excluNum }: Props) {
+export default function MainGameScreen({ excluNum, onGameOver }: Props) {
     const { alert } = Alert;
     const [currentGuess, setCurrentGuess] = useState<number>(randomize(1, 100, excluNum));
+    const [rounds, setRounds] = useState<number>(0);
+
+    const CURRENT_LOW = useRef(1);
+    const CURRENT_HIGH = useRef(100);
+
+    useEffect(() => {
+        if (currentGuess === excluNum) onGameOver(rounds);
+    }, [currentGuess, excluNum, onGameOver]);
 
     // Handlers
-    const handleLower = () => {};
-    const handleGreater = () => {};
     const handleNextGuess = (direction: string) => {
         if (
             (direction === 'lower' && currentGuess < excluNum) ||
@@ -25,7 +32,17 @@ export default function MainGameScreen({ excluNum }: Props) {
             return;
         }
 
-        return 'yay!';
+        if (direction === 'lower') CURRENT_HIGH.current = currentGuess;
+        if (direction === 'greater') CURRENT_LOW.current = currentGuess;
+
+        setCurrentGuessHelper(CURRENT_LOW, CURRENT_HIGH, currentGuess);
+        setRounds(rounds + 1);
+    };
+
+    // Helpers
+    const setCurrentGuessHelper = (first, second, exc) => {
+        const nextNumber = randomize(first.current, second.current, exc);
+        setCurrentGuess(nextNumber);
     };
 
     return (
